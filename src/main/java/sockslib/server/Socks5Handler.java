@@ -14,9 +14,9 @@
 
 package sockslib.server;
 
-import java.util.concurrent.CountDownLatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sockslib.client.Socks5;
 import sockslib.client.SocksProxy;
 import sockslib.client.SocksSocket;
 import sockslib.common.ProtocolErrorException;
@@ -25,17 +25,15 @@ import sockslib.common.methods.SocksMethod;
 import sockslib.server.io.Pipe;
 import sockslib.server.io.PipeListener;
 import sockslib.server.io.SocketPipe;
-import sockslib.server.msg.CommandMessage;
-import sockslib.server.msg.CommandResponseMessage;
-import sockslib.server.msg.MethodSelectionMessage;
-import sockslib.server.msg.MethodSelectionResponseMessage;
-import sockslib.server.msg.ServerReply;
+import sockslib.server.manager.User;
+import sockslib.server.msg.*;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * The class <code>Socks5Handler</code> represents a handler that can handle SOCKS5 protocol.
@@ -73,6 +71,8 @@ public class Socks5Handler implements SocksHandler {
   private SocksProxyServer socksProxyServer;
 
   private SessionManager sessionManager;
+
+  private ChainedProxyManager chainedProxyManager;
 
   @Override
   public void handle(Session session) throws Exception {
@@ -142,8 +142,13 @@ public class Socks5Handler implements SocksHandler {
     // DO connect
     try {
       // Connect directly.
-      if (proxy == null) {
+      if (chainedProxyManager == null && proxy == null) {
         socket = new Socket(remoteServerAddress, remoteServerPort);
+      } else if (chainedProxyManager != null) {
+        User user = (User) session.getAttribute(UsernamePasswordAuthenticator.USER_KEY);
+        ChainedProxy chainedProxy = chainedProxyManager.getChainedProxy(user);
+        socket = new SocksSocket(
+                new Socks5(chainedProxy), remoteServerAddress, remoteServerPort);
       } else {
         socket = new SocksSocket(proxy, remoteServerAddress, remoteServerPort);
       }
@@ -369,4 +374,8 @@ public class Socks5Handler implements SocksHandler {
     this.socksProxyServer = socksProxyServer;
   }
 
+  @Override
+  public void setChainedProxyManager(ChainedProxyManager chainedProxyManager) {
+    this.chainedProxyManager = chainedProxyManager;
+  }
 }

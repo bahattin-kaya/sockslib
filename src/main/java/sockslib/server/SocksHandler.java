@@ -109,4 +109,5 @@ public interface SocksHandler extends Runnable {
 
   void setSocksProxyServer(SocksProxyServer socksProxyServer);
 
+  void setChainedProxyManager(ChainedProxyManager chainedProxyManager);
 }

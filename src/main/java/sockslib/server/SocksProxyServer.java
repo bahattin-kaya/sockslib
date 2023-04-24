@@ -185,4 +185,8 @@ public interface SocksProxyServer {
   PipeInitializer getPipeInitializer();
 
   void setPipeInitializer(PipeInitializer pipeInitializer);
+
+  void setChainedProxyManager(ChainedProxyManager chainedProxyManager);
+
+  ChainedProxyManager getChainedProxyManager();
 }

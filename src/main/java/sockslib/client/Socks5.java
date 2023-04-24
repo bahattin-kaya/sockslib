@@ -14,27 +14,16 @@
 
 package sockslib.client;
 
-import sockslib.common.AnonymousCredentials;
-import sockslib.common.Credentials;
-import sockslib.common.SocksCommand;
-import sockslib.common.SocksException;
-import sockslib.common.UsernamePasswordCredentials;
-import sockslib.common.methods.GssApiMethod;
-import sockslib.common.methods.NoAuthenticationRequiredMethod;
-import sockslib.common.methods.SocksMethod;
-import sockslib.common.methods.SocksMethodRegistry;
-import sockslib.common.methods.UsernamePasswordMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sockslib.common.*;
+import sockslib.common.methods.*;
+import sockslib.server.ChainedProxy;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,6 +95,11 @@ public class Socks5 implements SocksProxy {
    * Resolve remote server's domain name in SOCKS server if it's false. It's default false.
    */
   private boolean alwaysResolveAddressLocally = false;
+
+  public Socks5(ChainedProxy chainedProxy){
+    this(chainedProxy.getChainedProxyAddress());
+    setCredentials(chainedProxy.getCredentials());
+  }
 
   /**
    * Constructs a Socks5 instance.

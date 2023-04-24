@@ -3,14 +3,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.fengyouchao</groupId>
+    <groupId>io.github.bahattinkaya</groupId>
     <artifactId>sockslib</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>sockslibs</name>
     <description>A Java library for SOCKS5 client and SOCKS5 server</description>
-    <url>http://fengyouchao.github.io/sockslib/</url>
+    <url>https://github.com/bahattin-kaya/sockslib</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -7,20 +7,13 @@ import sockslib.common.SSLConfiguration;
 import sockslib.common.methods.NoAuthenticationRequiredMethod;
 import sockslib.common.methods.SocksMethod;
 import sockslib.common.methods.UsernamePasswordMethod;
-import sockslib.server.io.PipeListener;
 import sockslib.server.listener.PipeInitializer;
 import sockslib.server.listener.SessionListener;
 import sockslib.server.manager.MemoryBasedUserManager;
 import sockslib.server.manager.UserManager;
 
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -52,6 +45,7 @@ public class SocksServerBuilder {
   private SSLConfiguration sslConfiguration;
   private Map<String, SessionListener> sessionListeners = new HashMap<>();
   private PipeInitializer pipeInitializer;
+  private ChainedProxyManager chainedProxyManager;
 
   /**
    * Creates a <code>SocksServerBuilder</code> with a <code>Class<? extends {@link
@@ -238,6 +232,11 @@ public class SocksServerBuilder {
     return this;
   }
 
+  public SocksServerBuilder setChainedProxyManager(ChainedProxyManager chainedProxyManager){
+      this.chainedProxyManager = chainedProxyManager;
+      return this;
+  }
+
   /**
    * Builds a {@link SocksProxyServer} instance.
    *
@@ -267,9 +266,9 @@ public class SocksServerBuilder {
         if (userManager == null) {
           userManager = new MemoryBasedUserManager();
           userManager.addUser("fucksocks", "fucksocks");
+          ((UsernamePasswordMethod) method).setAuthenticator(new UsernamePasswordAuthenticator
+                  (userManager));
         }
-        ((UsernamePasswordMethod) method).setAuthenticator(new UsernamePasswordAuthenticator
-            (userManager));
       }
       methods[i] = method;
       i++;
@@ -279,7 +278,9 @@ public class SocksServerBuilder {
     }
 
     proxyServer.setSupportMethods(methods);
-    if (proxy != null) {
+    if(chainedProxyManager != null){
+      proxyServer.setChainedProxyManager(chainedProxyManager);
+    } else if (proxy != null) {
       proxyServer.setProxy(proxy);
     }
     for (String name : sessionListeners.keySet()) {

@@ -128,6 +128,8 @@ public class BasicSocksProxyServer implements SocksProxyServer, Runnable {
 
   private PipeInitializer pipeInitializer;
 
+  private ChainedProxyManager chainedProxyManager;
+
   /**
    * Constructs a {@link BasicSocksProxyServer} by a {@link SocksHandler} class. The bind port is
    * 1080.
@@ -250,6 +252,7 @@ public class BasicSocksProxyServer implements SocksProxyServer, Runnable {
     socksHandler.setMethodSelector(methodSelector);
     socksHandler.setBufferSize(bufferSize);
     socksHandler.setProxy(proxy);
+    socksHandler.setChainedProxyManager(chainedProxyManager);
     socksHandler.setSocksProxyServer(this);
   }
 
@@ -382,5 +385,15 @@ public class BasicSocksProxyServer implements SocksProxyServer, Runnable {
   @Override
   public void setPipeInitializer(PipeInitializer pipeInitializer) {
     this.pipeInitializer = pipeInitializer;
+  }
+
+  @Override
+  public void setChainedProxyManager(ChainedProxyManager chainedProxyManager) {
+    this.chainedProxyManager = chainedProxyManager;
+  }
+
+  @Override
+  public ChainedProxyManager getChainedProxyManager() {
+    return chainedProxyManager;
   }
 }
